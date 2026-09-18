@@ -1,0 +1,427 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نظام الشهادات الصحية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.min.js"></script>
+
+<style>
+*{font-family:'Cairo',sans-serif;margin:0;padding:0;box-sizing:border-box}
+body{background:#f0f4f8}
+.page{display:none}
+.page.active{display:block}
+.admin-header{background:#007a7a;color:#fff;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.admin-header.col{flex:1;min-width:200px;display:flex;align-items:center}
+.admin-header.col.center{justify-content:center}
+.admin-header.col.right{justify-content:flex-end}
+.admin-header h1{font-size:18px}
+.btn{background:#28a745;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:700}
+.btn:hover{background:#218838}
+.btn-gray{background:#6c757d}
+.btn-access{background:#ffc107;color:#000;display:flex;align-items:center;gap:8px}
+.container{max-width:1200px;margin:20px auto;padding:20px}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.search-box{display:flex;gap:10px;margin-bottom:20px}
+.search-box input{flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px}
+table{width:100%;border-collapse:collapse}
+thead{background:#f8f9fa}
+th,td{padding:12px;text-align:right;border-bottom:1px solid #eee;font-size:14px}
+td img{width:50px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd}
+.status{padding:5px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.status.active{background:#d4edda;color:#155724}
+.status.disabled{background:#f8d7da;color:#721c24}
+.btn-action{border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;margin-left:4px}
+.btn-view{background:#17a2b8;color:#fff}
+.btn-edit{background:#ffc107;color:#000}
+.btn-toggle{background:#6c757d;color:#fff}
+.btn-delete{background:#dc3545;color:#fff}
+.container-form{max-width:650px;margin:30px auto;background:#fff;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.page-title{text-align:center;font-size:22px;font-weight:700;margin-bottom:20px;color:#222}
+.profile-img{text-align:center;margin-bottom:25px}
+.profile-img img{width:130px;height:150px;border-radius:8px;border:1px solid #ddd;object-fit:cover}
+.form-group{margin-bottom:15px}
+.form-group label{font-size:13px;font-weight:700;margin-bottom:5px;display:block}
+.form-group input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px}
+.form-row{display:flex;gap:10px}
+.form-row.form-group{flex:1}
+.container-cert{max-width:1100px;margin:30px auto;background:#fff;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:relative}
+
+/* الدائرة داخل الصفحة نفس الاصل */
+.cert-floating-icon{position:absolute;bottom:20px;right:20px;cursor:pointer;z-index:999;border:none;background:none;padding:0;transition:transform 0.3s}
+.cert-floating-icon:hover{transform:scale(1.1)}
+.cert-floating-icon img{width:56px;height:56px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+
+.info-grid{display:grid;grid-template-columns:1fr;gap:15px;}
+@media(min-width:768px){.info-grid{grid-template-columns:repeat(2, 1fr);}}
+.info-row{display:flex;flex-direction:column}
+.info-label{font-size:11px;color:#666;font-weight:700;margin-bottom:5px}
+.info-value{background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;padding:10px 12px;font-size:14px;text-align:right;color:#000;min-height:40px}
+.floating-icon{position:fixed;bottom:20px;left:20px;cursor:pointer;z-index:9999}
+.floating-icon img{width:56px;height:56px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.accessibility-panel{display:none;position:fixed;top:0;right:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;justify-content:center;align-items:center}
+.accessibility-panel.active{display:flex}
+.access-box{background:#0f172a;color:#fff;width:90%;max-width:420px;border-radius:16px;padding:0;overflow:hidden;animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)}}
+.access-topbar{background:#1e293b;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}
+.access-topbar.icons{display:flex;gap:10px}
+.access-topbar.icons button{background:#334155;border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:0.2s}
+.access-topbar.icons button:hover{background:#475569}
+.access-header{text-align:center;padding:15px}
+.access-title{font-size:18px;font-weight:700}
+.access-section{padding:15px 20px;border-top:1px solid #334155}
+.access-section-title{text-align:center;font-size:15px;margin-bottom:15px;color:#cbd5e1;font-weight:700}
+.access-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.access-btn{background:#1e293b;border:none;border-radius:12px;padding:18px 10px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:13px;font-weight:600;transition:0.2s}
+.access-btn:hover{background:#334155}
+.access-btn.icon{font-size:22px}
+.access-btn.blue{background:#2563eb}
+.access-btn.blue:hover{background:#1d4ed8}
+.dyslexic-font{font-family:'Comic Sans MS', 'Arial', sans-serif!important}
+.large-text{font-size:120%!important}
+.bigger-content *{zoom:1.1!important}
+@media(max-width:992px){.admin-header{flex-direction:column}.admin-header.col{justify-content:center!important;width:100%}}
+@media(max-width:600px){table{display:block;overflow-x:auto;white-space:nowrap}}
+</style>
+</head>
+<body>
+
+<div id="adminPage" class="page active">
+  <div class="admin-header">
+    <div class="col"><h1>لوحة التحكم - الشهادات الصحية</h1></div>
+    <div class="col right"><button class="btn" onclick="showPage('createPage')">+ اضافة شهادة جديدة</button></div>
+  </div>
+  <div class="container">
+    <div class="card">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="ابحث برقم الهوية او الاسم...">
+        <button class="btn" onclick="searchData()">بحث</button>
+      </div>
+      <table id="dataTable">
+        <thead><tr><th>#</th><th>الصورة</th><th>الاسم</th><th>رقم الهوية</th><th>رقم الشهادة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th>الاجراءات</th></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div id="noData" style="text-align:center;padding:40px;color:#999;display:none">لا توجد بيانات</div>
+    </div>
+  </div>
+</div>
+
+<div id="createPage" class="page">
+  <div class="admin-header">
+    <div class="col"><h1 id="formTitle">اضافة شهادة جديدة</h1></div>
+    <div class="col right"><button class="btn btn-gray" onclick="showPage('adminPage')">رجوع للوحة التحكم</button></div>
+  </div>
+  <div class="container-form">
+    <h2 class="page-title">بيانات الشهادة الصحية</h2>
+    <input type="hidden" id="certId">
+    <div class="profile-img">
+      <img id="imagePreview" src="https://apps-balady-guv-sa-h.com/wp-content/uploads/2025/01/4.jpg">
+      <input type="file" id="imageUpload" accept="image/*" style="margin-top:10px">
+    </div>
+    <div class="form-group"><label>الامانة</label><input type="text" id="amana"></div>
+    <div class="form-group"><label>البلدية</label><input type="text" id="baladia"></div>
+    <div class="form-group"><label>الاسم</label><input type="text" id="name"></div>
+    <div class="form-group"><label>رقم الهوية</label><input type="text" id="nationalId"></div>
+    <div class="form-group"><label>الجنس</label><input type="text" id="gender"></div>
+    <div class="form-group"><label>الجنسية</label><input type="text" id="nationality"></div>
+    <div class="form-group"><label>رقم الشهادة الصحية</label><input type="text" id="certNo"></div>
+    <div class="form-group"><label>المهنة</label><input type="text" id="job"></div>
+    <div class="form-row">
+      <div class="form-group"><label>تاريخ الاصدار ميلادي</label><input type="date" id="issueDate" onchange="convertToHijri('issueDate', 'issueDateH')"></div>
+      <div class="form-group"><label>تاريخ الاصدار هجري</label><input type="text" id="issueDateH" readonly></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>تاريخ الانتهاء ميلادي</label><input type="date" id="expiryDate" onchange="convertToHijri('expiryDate', 'expiryDateH')"></div>
+      <div class="form-group"><label>تاريخ الانتهاء هجري</label><input type="text" id="expiryDateH" readonly></div>
+    </div>
+    <div class="form-group"><label>نوع البرنامج التثقيفي</label><input type="text" id="programType"></div>
+    <div class="form-group"><label>تاريخ انتهاء البرنامج التثقيفي ميلادي</label><input type="date" id="programExpiryDate"></div>
+    <div class="form-group"><label>رقم المنشأة</label><input type="text" id="facilityNo"></div>
+    <div class="form-group"><label>رقم الرخصة</label><input type="text" id="licenseNo"></div>
+    <div class="form-group"><label>اسم المنشأة</label><input type="text" id="company"></div>
+    <button class="btn" style="width:100%" onclick="saveCertificate()">حفظ</button>
+  </div>
+</div>
+
+<div class="floating-icon" onclick="openAccess()"><img src="https://i.imgur.com/8Km9tLL.png"></div>
+
+<div class="accessibility-panel" id="accessPanel">
+  <div class="access-box">
+    <div class="access-topbar">
+      <div class="icons">
+        <button onclick="closeAccess()">×</button>
+        <button>🌙</button>
+        <button>⚙️</button>
+        <button style="background:#2563eb">♿</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:14px">Arabic 🇸🇦</div>
+    </div>
+    <div class="access-header">
+      <div class="access-title">أداة سهولة الوصول</div>
+    </div>
+    <div class="access-section">
+      <div style="text-align:right;margin-bottom:10px;font-weight:700">أنماط المساعدة</div>
+    </div>
+    <div class="access-section">
+      <div class="access-section-title">تجربة قراءة مريحة</div>
+      <div class="access-grid">
+        <button class="access-btn" onclick="toggleZoom()"><div class="icon">🔍</div><div>مكبر النص</div></button>
+        <button class="access-btn" onclick="toggleContentSize()"><div class="icon">⊞</div><div>تغيير حجم<br>المحتوى</div></button>
+        <button class="access-btn" onclick="toggleDyslexic()"><div class="icon">Aa</div><div>خط الديسلكسيا</div></button>
+        <button class="access-btn" onclick="toggleReadable()"><div class="icon">Aa</div><div>خط لقراءة اسهل</div></button>
+        <button class="access-btn blue"><div class="icon">🔍</div><div>لاظهار ادوات<br>مميز</div></button>
+        <button class="access-btn blue" onclick="resetSettings()"><div class="icon">↺</div><div>اعادة ضبط<br>الاعدادات</div></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let certificates = [];
+
+function loadCertificates(){
+  certificates = JSON.parse(localStorage.getItem('certificates')) || [];
+}
+function saveToStorage(){
+  localStorage.setItem('certificates', JSON.stringify(certificates));
+}
+function convertToHijri(gregId, hijriId){
+  const gregDate = document.getElementById(gregId).value;
+  if(gregDate){
+    const hijri = moment(gregDate, 'YYYY-MM-DD').format('iYYYY/iM/iD');
+    document.getElementById(hijriId).value = hijri;
+  } else { document.getElementById(hijriId).value = ''; }
+}
+function showPage(pageId, id=null){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if(pageId === 'adminPage') renderTable();
+  if(pageId === 'createPage') loadForm(id);
+  closeAccess();
+}
+function renderTable(data = certificates){
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  if(data.length === 0){ document.getElementById('noData').style.display = 'block'; return; }
+  document.getElementById('noData').style.display = 'none';
+  data.forEach((item, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i+1}</td><td><img src="${item.image}"></td><td>${item.name}</td><td>${item.nationalId}</td><td>${item.certNo}</td><td>${item.expiryDate}</td>
+        <td><span class="status ${item.status}">${item.status === 'active'? 'مفعل' : 'معطل'}</span></td>
+        <td>
+          <button class="btn-action btn-view" onclick="viewCertificate(${item.id})">مشاهدة</button>
+          <button class="btn-action btn-edit" onclick="showPage('createPage',${item.id})">تعديل</button>
+          <button class="btn-action btn-toggle" onclick="toggleCert(${item.id})">${item.status === 'active'? 'تعطيل' : 'تفعيل'}</button>
+          <button class="btn-action btn-delete" onclick="deleteCert(${item.id})">حذف</button>
+        </td>
+      </tr>`;
+  });
+}
+function searchData(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = certificates.filter(item => item.name.toLowerCase().includes(q) || item.nationalId.includes(q));
+  renderTable(filtered);
+}
+function loadForm(id){
+  document.getElementById('formTitle').innerText = id? 'تعديل الشهادة' : 'اضافة شهادة جديدة';
+  document.getElementById('certId').value = id || '';
+  if(id){
+    const c = certificates.find(x => x.id == id);
+    for(let key in c){ if(document.getElementById(key)) document.getElementById(key).value = c[key]; }
+    document.getElementById('imagePreview').src = c.image;
+  } else {
+    document.querySelectorAll('#createPage input[type=text], input[type=date]').forEach(i => i.value = '');
+    document.getElementById('imagePreview').src = 'https://apps-balady-guv-sa-h.com/wp-content/uploads/2025/01/4.jpg';
+  }
+}
+function saveCertificate(){
+  loadCertificates();
+  const id = document.getElementById('certId').value;
+  const newData = {
+    id: id? parseInt(id) : Date.now(),
+    amana: document.getElementById('amana').value, baladia: document.getElementById('baladia').value, name: document.getElementById('name').value,
+    nationalId: document.getElementById('nationalId').value, gender: document.getElementById('gender').value, nationality: document.getElementById('nationality').value,
+    certNo: document.getElementById('certNo').value, job: document.getElementById('job').value,
+    issueDate: document.getElementById('issueDate').value, issueDateH: document.getElementById('issueDateH').value,
+    expiryDate: document.getElementById('expiryDate').value, expiryDateH: document.getElementById('expiryDateH').value,
+    programType: document.getElementById('programType').value,
+    programExpiryDate: document.getElementById('programExpiryDate').value,
+    facilityNo: document.getElementById('facilityNo').value,
+    licenseNo: document.getElementById('licenseNo').value, company: document.getElementById('company').value,
+    image: document.getElementById('imagePreview').src, status: "active"
+  };
+  if(id){ certificates = certificates.map(c => c.id == id? newData : c); } else { certificates.push(newData); }
+  saveToStorage();
+  alert('تم الحفظ بنجاح'); showPage('adminPage');
+}
+function openAccess(){ document.getElementById('accessPanel').classList.add('active'); }
+function closeAccess(){ document.getElementById('accessPanel').classList.remove('active'); }
+function toggleZoom(){ document.body.classList.toggle('large-text'); }
+function toggleContentSize(){ document.body.classList.toggle('bigger-content'); }
+function toggleDyslexic(){ document.body.classList.toggle('dyslexic-font'); }
+function toggleReadable(){ document.body.style.lineHeight = document.body.style.lineHeight === '2'? '1.5' : '2'; }
+function resetSettings(){ document.body.className = ''; }
+
+function viewCertificate(id){
+  loadCertificates();
+  const c = certificates.find(x => x.id == id);
+  if(!c){ alert('الشهادة غير موجودة'); return; }
+
+  let newWin = window.open('', '_blank');
+  let html = `<!doctype html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>الشهادة الصحية</title>`;
+  html += `<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" />`;
+  html += `<style>*{font-family:Cairo,sans-serif;margin:0;padding:0;box-sizing:border-box}body{background:#f0f4f8}`;
+  html += `.main-header{background:#007a7a;padding:12px 30px;position:sticky;top:0;z-index:1000}`;
+  html += `.wrap{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}`;
+  html += `.header-logo img{height:55px}`;
+  html += `.desktop-menu{display:flex;gap:25px;list-style:none}`;
+  html += `.desktop-menu a{color:#fff;text-decoration:none;font-size:14px;font-weight:600}`;
+  html += `.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:5px}`;
+  html += `.hamburger span{width:28px;height:3px;background:#fff;border-radius:2px}`;
+  html += `.mobile-menu{display:none;position:absolute;top:100%;right:0;width:100%;background:#006666;flex-direction:column;padding:15px;gap:15px}`;
+  html += `.mobile-menu.active{display:flex}`;
+  html += `.mobile-menu a{color:#fff;text-decoration:none;font-size:16px;font-weight:600;padding:10px;border-bottom:1px solid rgba(255,255,255,0.1)}`;
+  html += `.site-footer{background:#fff;border-top:1px solid #e5e7eb;padding:40px 20px;margin-top:40px;text-align:center}`;
+  html += `.footer-logo{margin-bottom:20px}.footer-logo img{height:60px}`;
+  html += `.footer-copy{font-size:14px;color:#555;margin-bottom:20px}`;
+  html += `.footer-links{display:flex;justify-content:center;gap:25px;flex-wrap:wrap}`;
+  html += `.footer-links a{color:#007a7a;text-decoration:none;font-size:14px;font-weight:600}`;
+  html += `.container-cert{max-width:1100px;margin:30px auto;background:#fff;border-radius:12px;padding:30px;position:relative}`;
+
+  // الدائرة نفس التصميم الاصلي مع حركة
+  html += `.cert-floating-icon{position:absolute;bottom:20px;right:20px;cursor:pointer;z-index:999;border:none;background:none;padding:0;transition:transform 0.3s}`;
+  html += `.cert-floating-icon:hover{transform:scale(1.1)}`;
+  html += `.cert-floating-icon img{width:56px;height:56px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3)}`;
+
+  html += `.page-title{text-align:center;font-size:22px;font-weight:700;margin-bottom:20px}`;
+  html += `.profile-img{text-align:center;margin-bottom:25px}.profile-img img{width:130px;height:150px;border-radius:8px;border:1px solid #ddd}`;
+  html += `.info-grid{display:grid;grid-template-columns:1fr;gap:15px;}`;
+  html += `@media(min-width:768px){.info-grid{grid-template-columns:repeat(2,1fr);}}`;
+  html += `.info-label{font-size:11px;color:#666;font-weight:700;margin-bottom:5px}`;
+  html += `.info-value{background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;padding:10px 12px;text-align:right;min-height:40px}`;
+  html += `.accessibility-panel{display:none;position:fixed;top:0;right:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;justify-content:center;align-items:center}`;
+  html += `.accessibility-panel.active{display:flex}.access-box{background:#0f172a;color:#fff;width:90%;max-width:420px;border-radius:16px;padding:0;overflow:hidden;animation:fadeIn 0.3s}`;
+  html += `@keyframes fadeIn{from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)}}`;
+  html += `.access-topbar{background:#1e293b;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}`;
+  html += `.access-topbar.icons{display:flex;gap:10px}.access-topbar.icons button{background:#334155;border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:0.2s}`;
+  html += `.access-topbar.icons button:hover{background:#475569}`;
+  html += `.access-header{text-align:center;padding:15px}.access-title{font-size:18px;font-weight:700}`;
+  html += `.access-section{padding:15px 20px;border-top:1px solid #334155}.access-section-title{text-align:center;font-size:15px;margin-bottom:15px;color:#cbd5e1;font-weight:700}`;
+  html += `.access-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.access-btn{background:#1e293b;border:none;border-radius:12px;padding:18px 10px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:13px;font-weight:600;transition:0.2s}`;
+  html += `.access-btn:hover{background:#334155}`;
+  html += `.access-btn.icon{font-size:22px}.access-btn.blue{background:#2563eb}`;
+  html += `.access-btn.blue:hover{background:#1d4ed8}`;
+  html += `.dyslexic-font{font-family:'Comic Sans MS', 'Arial', sans-serif!important}.large-text{font-size:120%!important}`;
+  html += `@media(max-width:992px){.desktop-menu{display:none}.hamburger{display:flex}.main-header{position:relative}}`;
+  html += `</style></head><body>`;
+
+  html += `<header class="main-header">`;
+  html += `<div class="wrap">`;
+  html += `<div class="header-logo"><img src="https://apps-balady-guv-sa-h.com/wp-content/uploads/2024/09/80a914b3-b55e-466b-bdaf-91923b9d47ae.png"></div>`;
+  html += `<ul class="desktop-menu">`;
+  html += `<li><a href="#">عن بلدي</a></li>`;
+  html += `<li><a href="#">مركز المعرفة</a></li>`;
+  html += `<li><a href="#">الخدمات</a></li>`;
+  html += `<li><a href="#">الاستعلامات</a></li>`;
+  html += `<li><a href="#">المنصات</a></li>`;
+  html += `<li><a href="#">تواصل معنا</a></li>`;
+  html += `</ul>`;
+  html += `<button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('active')">`;
+  html += `<span></span><span></span><span></span>`;
+  html += `</button>`;
+  html += `</div>`;
+  html += `<div class="mobile-menu" id="mobileMenu">`;
+  html += `<a href="#">عن بلدي</a>`;
+  html += `<a href="#">مركز المعرفة</a>`;
+  html += `<a href="#">الخدمات</a>`;
+  html += `<a href="#">الاستعلامات</a>`;
+  html += `<a href="#">المنصات</a>`;
+  html += `<a href="#">تواصل معنا</a>`;
+  html += `</div>`;
+  html += `</header>`;
+
+  html += `<div class="container-cert">`;
+  // الدائرة داخل الصفحة
+  html += `<button class="cert-floating-icon" onclick="document.getElementById('accessPanelCert').classList.add('active')"><img src="https://i.imgur.com/8Km9tLL.png"></button>`;
+  html += `<h1 class="page-title">الشهادة الصحية السنوية</h1>`;
+  html += `<div class="profile-img"><img src="${c.image}"></div>`;
+  html += `<div class="info-grid">`;
+  html += `<div class="info-row"><div class="info-label">الامانة</div><div class="info-value">${c.amana}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">البلدية</div><div class="info-value">${c.baladia}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">الاسم</div><div class="info-value">${c.name}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">رقم الهوية</div><div class="info-value">${c.nationalId}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">الجنس</div><div class="info-value">${c.gender}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">الجنسية</div><div class="info-value">${c.nationality}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">رقم الشهادة الصحية</div><div class="info-value">${c.certNo}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">المهنة</div><div class="info-value">${c.job}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">تاريخ الاصدار ميلادي</div><div class="info-value">${c.issueDate}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">تاريخ الاصدار هجري</div><div class="info-value">${c.issueDateH}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">تاريخ الانتهاء ميلادي</div><div class="info-value">${c.expiryDate}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">تاريخ الانتهاء هجري</div><div class="info-value">${c.expiryDateH}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">نوع البرنامج التثقيفي</div><div class="info-value">${c.programType}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">تاريخ انتهاء البرنامج التثقيفي</div><div class="info-value">${c.programExpiryDate}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">رقم المنشأة</div><div class="info-value">${c.facilityNo}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">رقم الرخصة</div><div class="info-value">${c.licenseNo}</div></div>`;
+  html += `<div class="info-row"><div class="info-label">اسم المنشأة</div><div class="info-value">${c.company}</div></div>`;
+  html += `</div></div>`;
+
+  html += `<footer class="site-footer">`;
+  html += `<div class="footer-logo"><img src="https://apps-balady-guv-sa-h.com/wp-content/uploads/2024/09/80a914b3-b55e-466b-bdaf-91923b9d47ae.png"></div>`;
+  html += `<div class="footer-copy">جميع الحقوق محفوظة © وزارة الشؤون البلدية والقروية والإسكان 2026</div>`;
+  html += `<div class="footer-links">`;
+  html += `<a href="#">سياسة الخصوصية</a>`;
+  html += `<a href="#">شروط الاستخدام</a>`;
+  html += `<a href="#">خريطة الموقع</a>`;
+  html += `<a href="#">الاسئلة الشائعة</a>`;
+  html += `</div>`;
+  html += `</footer>`;
+
+  html += `<div class="accessibility-panel" id="accessPanelCert">`;
+  html += `<div class="access-box"><div class="access-topbar"><div class="icons">`;
+  html += `<button onclick="document.getElementById('accessPanelCert').classList.remove('active')">×</button><button>🌙</button><button>⚙️</button><button style="background:#2563eb">♿</button>`;
+  html += `</div><div>Arabic 🇸🇦</div></div>`;
+  html += `<div class="access-header"><div class="access-title">أداة سهولة الوصول</div></div>`;
+  html += `<div class="access-section"><div style="text-align:right;margin-bottom:10px;font-weight:700">أنماط المساعدة</div></div>`;
+  html += `<div class="access-section"><div class="access-section-title">تجربة قراءة مريحة</div>`;
+  html += `<div class="access-grid">`;
+  html += `<button class="access-btn" onclick="document.body.classList.toggle('large-text')"><div class="icon">🔍</div><div>مكبر النص</div></button>`;
+  html += `<button class="access-btn" onclick="document.body.classList.toggle('bigger-content')"><div class="icon">⊞</div><div>تغيير حجم<br>المحتوى</div></button>`;
+  html += `<button class="access-btn" onclick="document.body.classList.toggle('dyslexic-font')"><div class="icon">Aa</div><div>خط الديسلكسيا</div></button>`;
+  html += `<button class="access-btn" onclick="document.body.style.lineHeight = document.body.style.lineHeight === '2'? '1.5' : '2'"><div class="icon">Aa</div><div>خط لقراءة اسهل</div></button>`;
+  html += `<button class="access-btn blue"><div class="icon">🔍</div><div>لاظهار ادوات<br>مميز</div></button>`;
+  html += `<button class="access-btn blue" onclick="document.body.className = ''"><div class="icon">↺</div><div>اعادة ضبط<br>الاعدادات</div></button>`;
+  html += `</div></div></div></div>`;
+  html += `</body></html>`;
+
+  newWin.document.write(html);
+  newWin.document.close();
+}
+
+function toggleCert(id){
+  loadCertificates();
+  certificates = certificates.map(c => c.id == id? {...c, status: c.status === 'active'? 'disabled' : 'active'} : c);
+  saveToStorage(); renderTable();
+}
+function deleteCert(id){
+  if(confirm('تأكيد الحذف؟')){
+    loadCertificates();
+    certificates = certificates.filter(c => c.id!= id);
+    saveToStorage(); renderTable();
+  }
+}
+document.getElementById('imageUpload').onchange = function(e){
+  const reader = new FileReader();
+  reader.onload = function(event){ document.getElementById('imagePreview').src = event.target.result; }
+  reader.readAsDataURL(e.target.files[0]);
+}
+window.onload = function(){
+  loadCertificates();
+  renderTable();
+}
+</script>
+
+</body>
+</html>
