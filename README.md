@@ -1,427 +1,101 @@
-<!doctype html>
-<html dir="rtl" lang="ar">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام الشهادات الصحية</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.min.js"></script>
-
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>متجر سوريا</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&display=swap" rel="stylesheet">
 <style>
-*{font-family:'Cairo',sans-serif;margin:0;padding:0;box-sizing:border-box}
-body{background:#f0f4f8}
-.page{display:none}
-.page.active{display:block}
-.admin-header{background:#007a7a;color:#fff;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
-.admin-header.col{flex:1;min-width:200px;display:flex;align-items:center}
-.admin-header.col.center{justify-content:center}
-.admin-header.col.right{justify-content:flex-end}
-.admin-header h1{font-size:18px}
-.btn{background:#28a745;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:700}
-.btn:hover{background:#218838}
-.btn-gray{background:#6c757d}
-.btn-access{background:#ffc107;color:#000;display:flex;align-items:center;gap:8px}
-.container{max-width:1200px;margin:20px auto;padding:20px}
-.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.search-box{display:flex;gap:10px;margin-bottom:20px}
-.search-box input{flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:14px}
-table{width:100%;border-collapse:collapse}
-thead{background:#f8f9fa}
-th,td{padding:12px;text-align:right;border-bottom:1px solid #eee;font-size:14px}
-td img{width:50px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd}
-.status{padding:5px 10px;border-radius:20px;font-size:12px;font-weight:700}
-.status.active{background:#d4edda;color:#155724}
-.status.disabled{background:#f8d7da;color:#721c24}
-.btn-action{border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;margin-left:4px}
-.btn-view{background:#17a2b8;color:#fff}
-.btn-edit{background:#ffc107;color:#000}
-.btn-toggle{background:#6c757d;color:#fff}
-.btn-delete{background:#dc3545;color:#fff}
-.container-form{max-width:650px;margin:30px auto;background:#fff;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.page-title{text-align:center;font-size:22px;font-weight:700;margin-bottom:20px;color:#222}
-.profile-img{text-align:center;margin-bottom:25px}
-.profile-img img{width:130px;height:150px;border-radius:8px;border:1px solid #ddd;object-fit:cover}
-.form-group{margin-bottom:15px}
-.form-group label{font-size:13px;font-weight:700;margin-bottom:5px;display:block}
-.form-group input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px}
-.form-row{display:flex;gap:10px}
-.form-row.form-group{flex:1}
-.container-cert{max-width:1100px;margin:30px auto;background:#fff;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:relative}
-
-/* الدائرة داخل الصفحة نفس الاصل */
-.cert-floating-icon{position:absolute;bottom:20px;right:20px;cursor:pointer;z-index:999;border:none;background:none;padding:0;transition:transform 0.3s}
-.cert-floating-icon:hover{transform:scale(1.1)}
-.cert-floating-icon img{width:56px;height:56px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-
-.info-grid{display:grid;grid-template-columns:1fr;gap:15px;}
-@media(min-width:768px){.info-grid{grid-template-columns:repeat(2, 1fr);}}
-.info-row{display:flex;flex-direction:column}
-.info-label{font-size:11px;color:#666;font-weight:700;margin-bottom:5px}
-.info-value{background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;padding:10px 12px;font-size:14px;text-align:right;color:#000;min-height:40px}
-.floating-icon{position:fixed;bottom:20px;left:20px;cursor:pointer;z-index:9999}
-.floating-icon img{width:56px;height:56px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-.accessibility-panel{display:none;position:fixed;top:0;right:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;justify-content:center;align-items:center}
-.accessibility-panel.active{display:flex}
-.access-box{background:#0f172a;color:#fff;width:90%;max-width:420px;border-radius:16px;padding:0;overflow:hidden;animation:fadeIn 0.3s}
-@keyframes fadeIn{from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)}}
-.access-topbar{background:#1e293b;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}
-.access-topbar.icons{display:flex;gap:10px}
-.access-topbar.icons button{background:#334155;border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:0.2s}
-.access-topbar.icons button:hover{background:#475569}
-.access-header{text-align:center;padding:15px}
-.access-title{font-size:18px;font-weight:700}
-.access-section{padding:15px 20px;border-top:1px solid #334155}
-.access-section-title{text-align:center;font-size:15px;margin-bottom:15px;color:#cbd5e1;font-weight:700}
-.access-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.access-btn{background:#1e293b;border:none;border-radius:12px;padding:18px 10px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:13px;font-weight:600;transition:0.2s}
-.access-btn:hover{background:#334155}
-.access-btn.icon{font-size:22px}
-.access-btn.blue{background:#2563eb}
-.access-btn.blue:hover{background:#1d4ed8}
-.dyslexic-font{font-family:'Comic Sans MS', 'Arial', sans-serif!important}
-.large-text{font-size:120%!important}
-.bigger-content *{zoom:1.1!important}
-@media(max-width:992px){.admin-header{flex-direction:column}.admin-header.col{justify-content:center!important;width:100%}}
-@media(max-width:600px){table{display:block;overflow-x:auto;white-space:nowrap}}
-</style>
-</head>
-<body>
-
-<div id="adminPage" class="page active">
-  <div class="admin-header">
-    <div class="col"><h1>لوحة التحكم - الشهادات الصحية</h1></div>
-    <div class="col right"><button class="btn" onclick="showPage('createPage')">+ اضافة شهادة جديدة</button></div>
-  </div>
-  <div class="container">
-    <div class="card">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ابحث برقم الهوية او الاسم...">
-        <button class="btn" onclick="searchData()">بحث</button>
-      </div>
-      <table id="dataTable">
-        <thead><tr><th>#</th><th>الصورة</th><th>الاسم</th><th>رقم الهوية</th><th>رقم الشهادة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th>الاجراءات</th></tr></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-      <div id="noData" style="text-align:center;padding:40px;color:#999;display:none">لا توجد بيانات</div>
-    </div>
-  </div>
+:root{--green:#00ff88;--red:#ff3344;--bg:#000;--card:#0a0a0a;--border:#1a1a1a}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;background:var(--bg);color:#fff;padding-bottom:140px;overflow-x:hidden}
+.header{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:#000;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;max-width:480px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;text-align:center;cursor:pointer}
+.card:active{transform:scale(0.96)}.card-img{height:100px;background:#111}.card-img img{width:100%;height:100%;object-fit:cover}
+.card-body{padding:8px}.buy-btn{width:92%;margin:6px auto;background:#fff;color:#000;border:none;border-radius:8px;padding:8px;font-weight:800;font-size:11px;cursor:pointer}
+.page{display:none;max-width:480px;margin:0 auto;padding:12px}.page.active{display:block}
+.form-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px}
+.input-field{width:100%;background:#000;border:1px solid #222;border-radius:10px;padding:12px;color:#fff;margin-top:8px}
+.price-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}.price-card{background:var(--card);border:1px solid #222;border-radius:12px;padding:10px;text-align:center;cursor:pointer}.price-card.sel{border-color:var(--green);background:#0a1a0a}
+.sham-box{background:#fff;color:#000;padding:14px;border-radius:12px;font-weight:800;text-align:center;font-size:15px;margin:10px 0;border:2px solid var(--green)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);background:#000;border:1px solid var(--green);border-radius:14px;padding:14px;z-index:10000;transition:.4s;text-align:center;font-weight:800}.toast.show{transform:translateX(-50%) translateY(0)}.toast.accepted{color:var(--green)}.toast.rejected{color:var(--red);border-color:var(--red)}
+.order-card{border-radius:12px;padding:10px;margin-bottom:8px}.order-card.pending{background:#0a0a0a;border:1px solid #222}.order-card.accepted{border:2px solid var(--green);background:#0a1a0a}.order-card.rejected{border:2px solid var(--red);background:#1a0a0a}
+.bottom-nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(20,20,20,0.95);border:1px solid var(--border);border-radius:24px;padding:5px;display:flex;gap:4px;z-index:100}.bottom-nav button{background:transparent;border:none;color:#777;padding:10px 18px;border-radius:18px;font-size:12px;font-weight:800;cursor:pointer}.bottom-nav button.active{background:var(--green);color:#000;box-shadow:0 0 15px rgba(0,255,136,0.5)}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}
+.bubble{position:fixed;width:18px;height:18px;background:radial-gradient(circle, #00ff88 0%, rgba(0,255,136,0.8) 40%, transparent 70%);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%) scale(0);animation:bubbleBoom 0.6s ease-out forwards}
+@keyframes bubbleBoom{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(3);opacity:0.9}100%{transform:translate(-50%,-50%) scale(7);opacity:0}}
+.bubble2{position:fixed;width:8px;height:8px;background:#00ff88;border-radius:50%;pointer-events:none;z-index:99999;animation:part 0.6s ease-out forwards}
+@keyframes part{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) translate(var(--x), var(--y)) scale(0);opacity:0}}
+.footer-contact{background:linear-gradient(135deg,#0a1a0a,#000);border-top:2px solid var(--green);margin-top:30px;padding:20px 16px;text-align:center;border-radius:16px 16px 0 0}
+.footer-contact h3{color:var(--green);font-size:14px;margin-bottom:12px}.footer-contact a{color:#fff;text-decoration:none;display:block;font-size:11px;margin:6px 0;background:#000;border:1px solid #222;padding:10px;border-radius:10px}
+.footer-contact a span{color:var(--green);font-weight:800}
+</style></head><body>
+<div id="toast" class="toast"></div>
+<div class="header">
+<div>
+<h1 style="font-size:20px;font-weight:800;letter-spacing:1px">
+<span style="color:#fff">متج</span><span style="color:var(--green)">ر سور</span><span style="color:#fff">يا</span>
+</h1>
+<div style="font-size:9px;color:#888;margin-top:2px;font-weight:700">المطور ابراهيم الاحمد</div>
+</div>
+<div style="font-size:9px;color:var(--green)">● اشحن عبر شام كاش</div>
 </div>
 
-<div id="createPage" class="page">
-  <div class="admin-header">
-    <div class="col"><h1 id="formTitle">اضافة شهادة جديدة</h1></div>
-    <div class="col right"><button class="btn btn-gray" onclick="showPage('adminPage')">رجوع للوحة التحكم</button></div>
-  </div>
-  <div class="container-form">
-    <h2 class="page-title">بيانات الشهادة الصحية</h2>
-    <input type="hidden" id="certId">
-    <div class="profile-img">
-      <img id="imagePreview" src="https://apps-balady-guv-sa-h.com/wp-content/uploads/2025/01/4.jpg">
-      <input type="file" id="imageUpload" accept="image/*" style="margin-top:10px">
-    </div>
-    <div class="form-group"><label>الامانة</label><input type="text" id="amana"></div>
-    <div class="form-group"><label>البلدية</label><input type="text" id="baladia"></div>
-    <div class="form-group"><label>الاسم</label><input type="text" id="name"></div>
-    <div class="form-group"><label>رقم الهوية</label><input type="text" id="nationalId"></div>
-    <div class="form-group"><label>الجنس</label><input type="text" id="gender"></div>
-    <div class="form-group"><label>الجنسية</label><input type="text" id="nationality"></div>
-    <div class="form-group"><label>رقم الشهادة الصحية</label><input type="text" id="certNo"></div>
-    <div class="form-group"><label>المهنة</label><input type="text" id="job"></div>
-    <div class="form-row">
-      <div class="form-group"><label>تاريخ الاصدار ميلادي</label><input type="date" id="issueDate" onchange="convertToHijri('issueDate', 'issueDateH')"></div>
-      <div class="form-group"><label>تاريخ الاصدار هجري</label><input type="text" id="issueDateH" readonly></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>تاريخ الانتهاء ميلادي</label><input type="date" id="expiryDate" onchange="convertToHijri('expiryDate', 'expiryDateH')"></div>
-      <div class="form-group"><label>تاريخ الانتهاء هجري</label><input type="text" id="expiryDateH" readonly></div>
-    </div>
-    <div class="form-group"><label>نوع البرنامج التثقيفي</label><input type="text" id="programType"></div>
-    <div class="form-group"><label>تاريخ انتهاء البرنامج التثقيفي ميلادي</label><input type="date" id="programExpiryDate"></div>
-    <div class="form-group"><label>رقم المنشأة</label><input type="text" id="facilityNo"></div>
-    <div class="form-group"><label>رقم الرخصة</label><input type="text" id="licenseNo"></div>
-    <div class="form-group"><label>اسم المنشأة</label><input type="text" id="company"></div>
-    <button class="btn" style="width:100%" onclick="saveCertificate()">حفظ</button>
-  </div>
+<div id="p1" class="page active"><div class="grid" id="grid"></div>
+<!-- وصف آخر الصفحة -->
+<div class="footer-contact">
+<h3>تواصل معنا - متجر سوريا</h3>
+<a href="https://wa.me/963993893286" target="_blank">📱 <span>واتساب:</span> 0993893286</a>
+<a href="https://instagram.com/yc-515" target="_blank">📸 <span>انستغرام:</span> yc-515</a>
+<a href="mailto:asertzxcvnm988@gmail.com">✉️ <span>البريد:</span> asertzxcvnm988@gmail.com</a>
+<div style="margin-top:12px;font-size:8px;color:#555">متجر سوريا - المطور ابراهيم الاحمد - بوت قبول/رفض تلقائي</div>
+</div>
 </div>
 
-<div class="floating-icon" onclick="openAccess()"><img src="https://i.imgur.com/8Km9tLL.png"></div>
-
-<div class="accessibility-panel" id="accessPanel">
-  <div class="access-box">
-    <div class="access-topbar">
-      <div class="icons">
-        <button onclick="closeAccess()">×</button>
-        <button>🌙</button>
-        <button>⚙️</button>
-        <button style="background:#2563eb">♿</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;font-size:14px">Arabic 🇸🇦</div>
-    </div>
-    <div class="access-header">
-      <div class="access-title">أداة سهولة الوصول</div>
-    </div>
-    <div class="access-section">
-      <div style="text-align:right;margin-bottom:10px;font-weight:700">أنماط المساعدة</div>
-    </div>
-    <div class="access-section">
-      <div class="access-section-title">تجربة قراءة مريحة</div>
-      <div class="access-grid">
-        <button class="access-btn" onclick="toggleZoom()"><div class="icon">🔍</div><div>مكبر النص</div></button>
-        <button class="access-btn" onclick="toggleContentSize()"><div class="icon">⊞</div><div>تغيير حجم<br>المحتوى</div></button>
-        <button class="access-btn" onclick="toggleDyslexic()"><div class="icon">Aa</div><div>خط الديسلكسيا</div></button>
-        <button class="access-btn" onclick="toggleReadable()"><div class="icon">Aa</div><div>خط لقراءة اسهل</div></button>
-        <button class="access-btn blue"><div class="icon">🔍</div><div>لاظهار ادوات<br>مميز</div></button>
-        <button class="access-btn blue" onclick="resetSettings()"><div class="icon">↺</div><div>اعادة ضبط<br>الاعدادات</div></button>
-      </div>
-    </div>
-  </div>
+<div id="p2" class="page"><button onclick="goHome()" style="background:#111;color:#fff;border:1px solid #222;padding:6px 12px;border-radius:20px;font-size:11px">← رجوع</button><div style="display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin:10px 0"><img id="shadaImg" style="width:55px;height:55px;border-radius:10px"><div><h3 id="shadaTitle"></h3><div id="shadaSub" style="font-size:9px;color:#888"></div></div></div><div class="price-grid" id="priceGrid"></div><div class="form-box" id="dynamicFields"></div></div>
+<div id="pAmount" class="page"><button onclick="showP('p2')" style="background:#111;color:#fff;border:1px solid #222;padding:6px 12px;border-radius:20px;font-size:11px">← رجوع</button><div class="form-box"><h3 style="text-align:center;color:var(--green)">💰 إتمام الشراء</h3><div id="amountInfo" style="text-align:center;background:#000;padding:8px;border-radius:8px;font-size:10px;color:#aaa;margin:8px 0"></div><input id="amountInput" class="input-field" style="border:2px solid var(--green);text-align:center;font-size:18px;color:var(--green)"><label style="font-size:11px;color:#fff;margin-top:10px;display:block">رقم شام كاش:</label><div class="sham-box">e7c963615dcc95d2cb5222977ccdd96c</div><button onclick="copySham()" style="width:100%;background:#111;color:#fff;border:1px solid #222;border-radius:8px;padding:10px;font-size:11px">📋 نسخ رقم شام كاش</button><button style="width:100%;background:var(--green);color:#000;border:none;border-radius:8px;padding:12px;font-weight:800;margin-top:10px" onclick="goToTrans()">متابعة ➜</button></div></div>
+<div id="pTrans" class="page"><button onclick="showP('pAmount')" style="background:#111;color:#fff;border:1px solid #222;padding:6px 12px;border-radius:20px;font-size:11px">← رجوع</button><div class="form-box" style="text-align:center"><h3 style="color:var(--green)">🔢 رقم العملية</h3><div id="transInfo" style="background:#000;padding:8px;border-radius:8px;font-size:10px;color:#aaa;margin:8px 0"></div><input id="trInput" class="input-field" style="border:2px solid var(--green);text-align:center;font-weight:800" placeholder="رمز عملية شام كاش"><button onclick="openExplain()" style="width:100%;background:transparent;border:1px dashed var(--green);color:var(--green);border-radius:8px;padding:10px;font-weight:700;font-size:11px;margin-top:10px">📖 شرح عملية التحويل</button><button style="width:100%;background:var(--green);color:#000;border:none;border-radius:8px;padding:12px;font-weight:800;margin-top:10px" onclick="finalSend()">تأكيد التحويل ✅</button></div></div>
+<div id="pOrders" class="page"><div class="form-box"><h3 style="text-align:center">📦 طلباتي</h3><div id="ordersList" style="margin-top:10px"></div></div>
+<div class="footer-contact">
+<h3>تواصل معنا</h3>
+<a href="https://wa.me/963993893286" target="_blank">📱 واتساب: 0993893286</a>
+<a href="https://instagram.com/yc-515" target="_blank">📸 انستغرام: yc-515</a>
+<a href="mailto:asertzxcvnm988@gmail.com">✉️ البريد: asertzxcvnm988@gmail.com</a>
 </div>
+</div>
+
+<div id="explainModal" class="modal"><div style="background:#151515;border:1px solid var(--green);border-radius:16px;max-width:360px;width:100%"><div style="background:#000;padding:12px;display:flex;justify-content:space-between;border-bottom:1px solid #222"><b style="color:var(--green)">📖 شرح التحويل</b><button onclick="closeExplain()" style="background:#222;color:#fff;border:none;width:28px;height:28px;border-radius:50%">✕</button></div><div style="padding:14px;color:#fff;font-size:11px;line-height:2;text-align:right">1- افتح شام كاش<br>2- سجل العمليات<br>3- انسخ رقم العملية<br>4- الصق هنا<br><br>رقم متجر سوريا: 564e7c963615dcc95d2cb5222977ccdd96c</div><button onclick="closeExplain()" style="width:100%;background:var(--green);color:#000;border:none;padding:12px;font-weight:800">فهمت ✅</button></div></div>
+
+<div class="bottom-nav"><button id="btnHome" class="active" onclick="switchTab('home')">الرئيسية</button><button id="btnOrders" onclick="switchTab('orders')">طلباتي 📦</button></div>
 
 <script>
-let certificates = [];
-
-function loadCertificates(){
-  certificates = JSON.parse(localStorage.getItem('certificates')) || [];
-}
-function saveToStorage(){
-  localStorage.setItem('certificates', JSON.stringify(certificates));
-}
-function convertToHijri(gregId, hijriId){
-  const gregDate = document.getElementById(gregId).value;
-  if(gregDate){
-    const hijri = moment(gregDate, 'YYYY-MM-DD').format('iYYYY/iM/iD');
-    document.getElementById(hijriId).value = hijri;
-  } else { document.getElementById(hijriId).value = ''; }
-}
-function showPage(pageId, id=null){
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  if(pageId === 'adminPage') renderTable();
-  if(pageId === 'createPage') loadForm(id);
-  closeAccess();
-}
-function renderTable(data = certificates){
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  if(data.length === 0){ document.getElementById('noData').style.display = 'block'; return; }
-  document.getElementById('noData').style.display = 'none';
-  data.forEach((item, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i+1}</td><td><img src="${item.image}"></td><td>${item.name}</td><td>${item.nationalId}</td><td>${item.certNo}</td><td>${item.expiryDate}</td>
-        <td><span class="status ${item.status}">${item.status === 'active'? 'مفعل' : 'معطل'}</span></td>
-        <td>
-          <button class="btn-action btn-view" onclick="viewCertificate(${item.id})">مشاهدة</button>
-          <button class="btn-action btn-edit" onclick="showPage('createPage',${item.id})">تعديل</button>
-          <button class="btn-action btn-toggle" onclick="toggleCert(${item.id})">${item.status === 'active'? 'تعطيل' : 'تفعيل'}</button>
-          <button class="btn-action btn-delete" onclick="deleteCert(${item.id})">حذف</button>
-        </td>
-      </tr>`;
-  });
-}
-function searchData(){
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = certificates.filter(item => item.name.toLowerCase().includes(q) || item.nationalId.includes(q));
-  renderTable(filtered);
-}
-function loadForm(id){
-  document.getElementById('formTitle').innerText = id? 'تعديل الشهادة' : 'اضافة شهادة جديدة';
-  document.getElementById('certId').value = id || '';
-  if(id){
-    const c = certificates.find(x => x.id == id);
-    for(let key in c){ if(document.getElementById(key)) document.getElementById(key).value = c[key]; }
-    document.getElementById('imagePreview').src = c.image;
-  } else {
-    document.querySelectorAll('#createPage input[type=text], input[type=date]').forEach(i => i.value = '');
-    document.getElementById('imagePreview').src = 'https://apps-balady-guv-sa-h.com/wp-content/uploads/2025/01/4.jpg';
-  }
-}
-function saveCertificate(){
-  loadCertificates();
-  const id = document.getElementById('certId').value;
-  const newData = {
-    id: id? parseInt(id) : Date.now(),
-    amana: document.getElementById('amana').value, baladia: document.getElementById('baladia').value, name: document.getElementById('name').value,
-    nationalId: document.getElementById('nationalId').value, gender: document.getElementById('gender').value, nationality: document.getElementById('nationality').value,
-    certNo: document.getElementById('certNo').value, job: document.getElementById('job').value,
-    issueDate: document.getElementById('issueDate').value, issueDateH: document.getElementById('issueDateH').value,
-    expiryDate: document.getElementById('expiryDate').value, expiryDateH: document.getElementById('expiryDateH').value,
-    programType: document.getElementById('programType').value,
-    programExpiryDate: document.getElementById('programExpiryDate').value,
-    facilityNo: document.getElementById('facilityNo').value,
-    licenseNo: document.getElementById('licenseNo').value, company: document.getElementById('company').value,
-    image: document.getElementById('imagePreview').src, status: "active"
-  };
-  if(id){ certificates = certificates.map(c => c.id == id? newData : c); } else { certificates.push(newData); }
-  saveToStorage();
-  alert('تم الحفظ بنجاح'); showPage('adminPage');
-}
-function openAccess(){ document.getElementById('accessPanel').classList.add('active'); }
-function closeAccess(){ document.getElementById('accessPanel').classList.remove('active'); }
-function toggleZoom(){ document.body.classList.toggle('large-text'); }
-function toggleContentSize(){ document.body.classList.toggle('bigger-content'); }
-function toggleDyslexic(){ document.body.classList.toggle('dyslexic-font'); }
-function toggleReadable(){ document.body.style.lineHeight = document.body.style.lineHeight === '2'? '1.5' : '2'; }
-function resetSettings(){ document.body.className = ''; }
-
-function viewCertificate(id){
-  loadCertificates();
-  const c = certificates.find(x => x.id == id);
-  if(!c){ alert('الشهادة غير موجودة'); return; }
-
-  let newWin = window.open('', '_blank');
-  let html = `<!doctype html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>الشهادة الصحية</title>`;
-  html += `<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet" />`;
-  html += `<style>*{font-family:Cairo,sans-serif;margin:0;padding:0;box-sizing:border-box}body{background:#f0f4f8}`;
-  html += `.main-header{background:#007a7a;padding:12px 30px;position:sticky;top:0;z-index:1000}`;
-  html += `.wrap{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}`;
-  html += `.header-logo img{height:55px}`;
-  html += `.desktop-menu{display:flex;gap:25px;list-style:none}`;
-  html += `.desktop-menu a{color:#fff;text-decoration:none;font-size:14px;font-weight:600}`;
-  html += `.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:5px}`;
-  html += `.hamburger span{width:28px;height:3px;background:#fff;border-radius:2px}`;
-  html += `.mobile-menu{display:none;position:absolute;top:100%;right:0;width:100%;background:#006666;flex-direction:column;padding:15px;gap:15px}`;
-  html += `.mobile-menu.active{display:flex}`;
-  html += `.mobile-menu a{color:#fff;text-decoration:none;font-size:16px;font-weight:600;padding:10px;border-bottom:1px solid rgba(255,255,255,0.1)}`;
-  html += `.site-footer{background:#fff;border-top:1px solid #e5e7eb;padding:40px 20px;margin-top:40px;text-align:center}`;
-  html += `.footer-logo{margin-bottom:20px}.footer-logo img{height:60px}`;
-  html += `.footer-copy{font-size:14px;color:#555;margin-bottom:20px}`;
-  html += `.footer-links{display:flex;justify-content:center;gap:25px;flex-wrap:wrap}`;
-  html += `.footer-links a{color:#007a7a;text-decoration:none;font-size:14px;font-weight:600}`;
-  html += `.container-cert{max-width:1100px;margin:30px auto;background:#fff;border-radius:12px;padding:30px;position:relative}`;
-
-  // الدائرة نفس التصميم الاصلي مع حركة
-  html += `.cert-floating-icon{position:absolute;bottom:20px;right:20px;cursor:pointer;z-index:999;border:none;background:none;padding:0;transition:transform 0.3s}`;
-  html += `.cert-floating-icon:hover{transform:scale(1.1)}`;
-  html += `.cert-floating-icon img{width:56px;height:56px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3)}`;
-
-  html += `.page-title{text-align:center;font-size:22px;font-weight:700;margin-bottom:20px}`;
-  html += `.profile-img{text-align:center;margin-bottom:25px}.profile-img img{width:130px;height:150px;border-radius:8px;border:1px solid #ddd}`;
-  html += `.info-grid{display:grid;grid-template-columns:1fr;gap:15px;}`;
-  html += `@media(min-width:768px){.info-grid{grid-template-columns:repeat(2,1fr);}}`;
-  html += `.info-label{font-size:11px;color:#666;font-weight:700;margin-bottom:5px}`;
-  html += `.info-value{background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;padding:10px 12px;text-align:right;min-height:40px}`;
-  html += `.accessibility-panel{display:none;position:fixed;top:0;right:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;justify-content:center;align-items:center}`;
-  html += `.accessibility-panel.active{display:flex}.access-box{background:#0f172a;color:#fff;width:90%;max-width:420px;border-radius:16px;padding:0;overflow:hidden;animation:fadeIn 0.3s}`;
-  html += `@keyframes fadeIn{from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)}}`;
-  html += `.access-topbar{background:#1e293b;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}`;
-  html += `.access-topbar.icons{display:flex;gap:10px}.access-topbar.icons button{background:#334155;border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:0.2s}`;
-  html += `.access-topbar.icons button:hover{background:#475569}`;
-  html += `.access-header{text-align:center;padding:15px}.access-title{font-size:18px;font-weight:700}`;
-  html += `.access-section{padding:15px 20px;border-top:1px solid #334155}.access-section-title{text-align:center;font-size:15px;margin-bottom:15px;color:#cbd5e1;font-weight:700}`;
-  html += `.access-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.access-btn{background:#1e293b;border:none;border-radius:12px;padding:18px 10px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:13px;font-weight:600;transition:0.2s}`;
-  html += `.access-btn:hover{background:#334155}`;
-  html += `.access-btn.icon{font-size:22px}.access-btn.blue{background:#2563eb}`;
-  html += `.access-btn.blue:hover{background:#1d4ed8}`;
-  html += `.dyslexic-font{font-family:'Comic Sans MS', 'Arial', sans-serif!important}.large-text{font-size:120%!important}`;
-  html += `@media(max-width:992px){.desktop-menu{display:none}.hamburger{display:flex}.main-header{position:relative}}`;
-  html += `</style></head><body>`;
-
-  html += `<header class="main-header">`;
-  html += `<div class="wrap">`;
-  html += `<div class="header-logo"><img src="https://apps-balady-guv-sa-h.com/wp-content/uploads/2024/09/80a914b3-b55e-466b-bdaf-91923b9d47ae.png"></div>`;
-  html += `<ul class="desktop-menu">`;
-  html += `<li><a href="#">عن بلدي</a></li>`;
-  html += `<li><a href="#">مركز المعرفة</a></li>`;
-  html += `<li><a href="#">الخدمات</a></li>`;
-  html += `<li><a href="#">الاستعلامات</a></li>`;
-  html += `<li><a href="#">المنصات</a></li>`;
-  html += `<li><a href="#">تواصل معنا</a></li>`;
-  html += `</ul>`;
-  html += `<button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('active')">`;
-  html += `<span></span><span></span><span></span>`;
-  html += `</button>`;
-  html += `</div>`;
-  html += `<div class="mobile-menu" id="mobileMenu">`;
-  html += `<a href="#">عن بلدي</a>`;
-  html += `<a href="#">مركز المعرفة</a>`;
-  html += `<a href="#">الخدمات</a>`;
-  html += `<a href="#">الاستعلامات</a>`;
-  html += `<a href="#">المنصات</a>`;
-  html += `<a href="#">تواصل معنا</a>`;
-  html += `</div>`;
-  html += `</header>`;
-
-  html += `<div class="container-cert">`;
-  // الدائرة داخل الصفحة
-  html += `<button class="cert-floating-icon" onclick="document.getElementById('accessPanelCert').classList.add('active')"><img src="https://i.imgur.com/8Km9tLL.png"></button>`;
-  html += `<h1 class="page-title">الشهادة الصحية السنوية</h1>`;
-  html += `<div class="profile-img"><img src="${c.image}"></div>`;
-  html += `<div class="info-grid">`;
-  html += `<div class="info-row"><div class="info-label">الامانة</div><div class="info-value">${c.amana}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">البلدية</div><div class="info-value">${c.baladia}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">الاسم</div><div class="info-value">${c.name}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">رقم الهوية</div><div class="info-value">${c.nationalId}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">الجنس</div><div class="info-value">${c.gender}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">الجنسية</div><div class="info-value">${c.nationality}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">رقم الشهادة الصحية</div><div class="info-value">${c.certNo}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">المهنة</div><div class="info-value">${c.job}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">تاريخ الاصدار ميلادي</div><div class="info-value">${c.issueDate}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">تاريخ الاصدار هجري</div><div class="info-value">${c.issueDateH}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">تاريخ الانتهاء ميلادي</div><div class="info-value">${c.expiryDate}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">تاريخ الانتهاء هجري</div><div class="info-value">${c.expiryDateH}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">نوع البرنامج التثقيفي</div><div class="info-value">${c.programType}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">تاريخ انتهاء البرنامج التثقيفي</div><div class="info-value">${c.programExpiryDate}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">رقم المنشأة</div><div class="info-value">${c.facilityNo}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">رقم الرخصة</div><div class="info-value">${c.licenseNo}</div></div>`;
-  html += `<div class="info-row"><div class="info-label">اسم المنشأة</div><div class="info-value">${c.company}</div></div>`;
-  html += `</div></div>`;
-
-  html += `<footer class="site-footer">`;
-  html += `<div class="footer-logo"><img src="https://apps-balady-guv-sa-h.com/wp-content/uploads/2024/09/80a914b3-b55e-466b-bdaf-91923b9d47ae.png"></div>`;
-  html += `<div class="footer-copy">جميع الحقوق محفوظة © وزارة الشؤون البلدية والقروية والإسكان 2026</div>`;
-  html += `<div class="footer-links">`;
-  html += `<a href="#">سياسة الخصوصية</a>`;
-  html += `<a href="#">شروط الاستخدام</a>`;
-  html += `<a href="#">خريطة الموقع</a>`;
-  html += `<a href="#">الاسئلة الشائعة</a>`;
-  html += `</div>`;
-  html += `</footer>`;
-
-  html += `<div class="accessibility-panel" id="accessPanelCert">`;
-  html += `<div class="access-box"><div class="access-topbar"><div class="icons">`;
-  html += `<button onclick="document.getElementById('accessPanelCert').classList.remove('active')">×</button><button>🌙</button><button>⚙️</button><button style="background:#2563eb">♿</button>`;
-  html += `</div><div>Arabic 🇸🇦</div></div>`;
-  html += `<div class="access-header"><div class="access-title">أداة سهولة الوصول</div></div>`;
-  html += `<div class="access-section"><div style="text-align:right;margin-bottom:10px;font-weight:700">أنماط المساعدة</div></div>`;
-  html += `<div class="access-section"><div class="access-section-title">تجربة قراءة مريحة</div>`;
-  html += `<div class="access-grid">`;
-  html += `<button class="access-btn" onclick="document.body.classList.toggle('large-text')"><div class="icon">🔍</div><div>مكبر النص</div></button>`;
-  html += `<button class="access-btn" onclick="document.body.classList.toggle('bigger-content')"><div class="icon">⊞</div><div>تغيير حجم<br>المحتوى</div></button>`;
-  html += `<button class="access-btn" onclick="document.body.classList.toggle('dyslexic-font')"><div class="icon">Aa</div><div>خط الديسلكسيا</div></button>`;
-  html += `<button class="access-btn" onclick="document.body.style.lineHeight = document.body.style.lineHeight === '2'? '1.5' : '2'"><div class="icon">Aa</div><div>خط لقراءة اسهل</div></button>`;
-  html += `<button class="access-btn blue"><div class="icon">🔍</div><div>لاظهار ادوات<br>مميز</div></button>`;
-  html += `<button class="access-btn blue" onclick="document.body.className = ''"><div class="icon">↺</div><div>اعادة ضبط<br>الاعدادات</div></button>`;
-  html += `</div></div></div></div>`;
-  html += `</body></html>`;
-
-  newWin.document.write(html);
-  newWin.document.close();
-}
-
-function toggleCert(id){
-  loadCertificates();
-  certificates = certificates.map(c => c.id == id? {...c, status: c.status === 'active'? 'disabled' : 'active'} : c);
-  saveToStorage(); renderTable();
-}
-function deleteCert(id){
-  if(confirm('تأكيد الحذف؟')){
-    loadCertificates();
-    certificates = certificates.filter(c => c.id!= id);
-    saveToStorage(); renderTable();
-  }
-}
-document.getElementById('imageUpload').onchange = function(e){
-  const reader = new FileReader();
-  reader.onload = function(event){ document.getElementById('imagePreview').src = event.target.result; }
-  reader.readAsDataURL(e.target.files[0]);
-}
-window.onload = function(){
-  loadCertificates();
-  renderTable();
-}
-</script>
-
-</body>
-</html>
+const BOT_TOKEN="9008127616:AAGqm30IKE77mIBCd85G8AU69C2ozbrS0zY",CHAT_ID="8943722469";
+let curProduct=null,selPrice=null,selOrig=null,selLabel=null,orders=JSON.parse(localStorage.getItem('syria_full')||'[]'),fieldVals={},lastUpdateId=0;
+const APPS={
+PUBG:{title:"ببجي موبايل",method:"عن طريق ID",img:"https://cdn.phototourl.com/member/2026-10-29-2af2757e-52f4-44fb-b94d-516dc66c1164.jpg",fields:[{k:"playerId",l:"معرّف اللاعب ID",p:"51979951923"}],prices:[{l:"60 UC",o:0.85},{l:"325 UC",o:4.2},{l:"660 UC",o:8.5},{l:"1800 UC",o:22},{l:"3850 UC",o:45}]},
+Free:{title:"فري فاير",method:"عن طريق ID",img:"https://cdn.phototourl.com/member/2026-10-29-6dfafab9-4b48-4b78-adc3-2402fdb74720.jpg",fields:[{k:"playerId",l:"ID",p:"123456"}],prices:[{l:"100 جوهرة",o:1.1},{l:"1060",o:11}]},
+ML:{title:"موبايل ليجند",method:"ID + Server",img:"https://cdn.phototourl.com/member/2026-10-29-46e62be6-8a26-450f-8b49-352fd55ea11f.jpg",fields:[{k:"playerId",l:"ID",p:"123456"},{k:"server",l:"السيرفر",p:"1234"}],prices:[{l:"86 جوهرة",o:1.4}]},
+Jawaker:{title:"جواكر",method:"عن طريق اسم المستخدم",img:"https://cdn.phototourl.com/member/2026-10-29-5068ceda-103a-46ee-b65a-c60bbbb07d73.png",fields:[{k:"username",l:"اسم المستخدم",p:"اسمك"}],prices:[{l:"100K",o:1},{l:"1M",o:8}]},
+iTunes:{title:"iTunes",method:"عن طريق الإيميل",img:"https://cdn.phototourl.com/member/2026-10-29-fd2b7e6c-77a2-4c9a-b233-aef39aebb725.jpg",fields:[{k:"email",l:"الإيميل",p:"email@test.com"}],prices:[{l:"10$",o:10}]},
+Google:{title:"Google Play",method:"عن طريق الإيميل",img:"https://cdn.phototourl.com/member/2026-10-29-9920ea10-9121-4e3c-8266-a2244d32bf37.png",fields:[{k:"email",l:"Gmail",p:"gmail.com"}],prices:[{l:"10$",o:10}]},
+PS:{title:"PlayStation",method:"عن طريق الإيميل",img:"https://cdn.phototourl.com/member/2026-10-29-976fe36b-8ffc-47e8-9e44-aa510b19ef75.png",fields:[{k:"email",l:"إيميل PSN",p:"psn@test.com"}],prices:[{l:"10$ PSN",o:10}]},
+Netflix:{title:"Netflix",method:"عن طريق الحساب",img:"https://cdn.phototourl.com/member/2026-10-29-5bfa203e-4a65-4285-8b67-b30a44cdf0c8.png",fields:[{k:"email",l:"إيميل نتفليكس",p:"netflix@test.com"}],prices:[{l:"شهر",o:8.99}]}
+};
+function finalPrice(o){return (o+1).toFixed(2)}
+function save(){localStorage.setItem('syria_full',JSON.stringify(orders))}
+function toast(m,t=''){let x=document.getElementById('toast');x.innerText=m;x.className='toast show '+t;setTimeout(()=>x.classList.remove('show'),3500)}
+function switchTab(type){document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));if(type=='home'){document.getElementById('btnHome').classList.add('active');showP('p1');render()}else{document.getElementById('btnOrders').classList.add('active');showP('pOrders');renderOrders()}}
+function showP(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function goHome(){switchTab('home')}
+function createBubble(e){let x=e.clientX||(e.touches&&e.touches[0].clientX);let y=e.clientY||(e.touches&&e.touches[0].clientY);if(!x||!y) return;let b=document.createElement('div');b.className='bubble';b.style.left=x+'px';b.style.top=y+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),600);for(let i=0;i<6;i++){let p=document.createElement('div');p.className='bubble2';let ang=Math.random()*360;let dist=25+Math.random()*45;let rx=Math.cos(ang*Math.PI/180)*dist;let ry=Math.sin(ang*Math.PI/180)*dist;p.style.left=x+'px';p.style.top=y+'px';p.style.setProperty('--x',rx+'px');p.style.setProperty('--y',ry+'px');document.body.appendChild(p);setTimeout(()=>p.remove(),700)}}
+document.addEventListener('click',createBubble);document.addEventListener('touchstart',createBubble,{passive:true});
+function render(){let h="";Object.keys(APPS).forEach(k=>{let p=APPS[k];h+=`<div class="card" onclick="openApp('${k}')"><div class="card-img"><img src="${p.img}"></div><div class="card-body"><h3>${p.title}</h3><div style="font-size:9px;color:#666">${p.method}</div><div style="color:var(--green);font-weight:800">$${finalPrice(p.prices[0].o)}</div></div></div>`});document.getElementById('grid').innerHTML=h}
+function openApp(k){let p=APPS[k];curProduct=p;showP('p2');document.getElementById('shadaImg').src=p.img;document.getElementById('shadaTitle').innerText=p.title+" - متجر سوريا";document.getElementById('shadaSub').innerText=p.method;let pg="";p.prices.forEach((pr,i)=>{pg+=`<div class="price-card" id="pr${i}" onclick="selectPrice(${i},'${pr.l}',${pr.o})"><b>${pr.l}</b><div style="color:var(--green)">$${finalPrice(pr.o)}</div></div>`});document.getElementById('priceGrid').innerHTML=pg;let fh="";p.fields.forEach(f=>{fh+=`<label style="font-size:10px;color:var(--green)">${f.l} *</label><input id="f_${f.k}" class="input-field" placeholder="${f.p}" oninput="checkFields()">`});fh+=`<div id="selBox" style="text-align:center;color:#666;font-size:11px;margin-top:10px">اختر الباقة</div><button id="btnCont" onclick="goToAmount()" disabled style="width:100%;background:#222;color:#666;border:none;border-radius:8px;padding:12px;font-weight:800;margin-top:10px">أكمل البيانات ➜</button>`;document.getElementById('dynamicFields').innerHTML=fh}
+function selectPrice(i,l,o){document.querySelectorAll('.price-card').forEach(c=>c.classList.remove('sel'));document.getElementById('pr'+i).classList.add('sel');selOrig=o;selPrice=parseFloat(finalPrice(o));selLabel=l;checkFields()}
+function checkFields(){if(!curProduct) return;let ok=true;fieldVals={};curProduct.fields.forEach(f=>{let el=document.getElementById('f_'+f.k);let v=el?el.value.trim():"";fieldVals[f.k]=v;if(v.length<3) ok=false});let box=document.getElementById('selBox');if(box) box.innerHTML=selPrice?`✅ ${selLabel} - $${selPrice} - ${fieldVals.playerId||fieldVals.username||fieldVals.email||''}`:'اختر الباقة';let btn=document.getElementById('btnCont');if(btn){if(ok&&selPrice){btn.disabled=false;btn.style.background='var(--green)';btn.style.color='#000'}else{btn.disabled=true;btn.style.background='#222';btn.style.color='#666'}}}
+function goToAmount(){showP('pAmount');document.getElementById('amountInfo').innerHTML=`📦 ${curProduct.title} ${selLabel}<br>🔹 ${fieldVals.playerId||fieldVals.username||fieldVals.email}<br>💰 $${selPrice}`;document.getElementById('amountInput').value=selPrice}
+function goToTrans(){showP('pTrans');document.getElementById('transInfo').innerHTML=`📦 ${curProduct.title} ${selLabel}<br>💵 ${document.getElementById('amountInput').value}$`}
+function openExplain(){document.getElementById('explainModal').classList.add('show')}function closeExplain(){document.getElementById('explainModal').classList.remove('show')}
+function copySham(){navigator.clipboard.writeText('564f32079395977157caff67530a2e94');toast('✅ تم النسخ','accepted')}
+function finalSend(){let tr=document.getElementById('trInput').value.trim();if(!tr) return alert('رمز العملية');let amt=document.getElementById('amountInput').value.trim();let id=Date.now().toString().slice(-6);let main=fieldVals.playerId||fieldVals.username||fieldVals.email||"";let order={id,title:curProduct.title+" "+selLabel,mainId:main,orig:selOrig,price:selPrice,amt,tr,status:"pending",time:new Date().toLocaleString(),img:curProduct.img};orders.unshift(order);save();let msg=`🔥 متجر سوريا #${id}\n📦 ${curProduct.title} ${selLabel}\n💰 الأصلي: $${selOrig} | عندك: $${selPrice}\n🔹 ${main}\n💵 محول: ${amt}\n🔢 شام: ${tr}`;let kb={inline_keyboard:[[{text:"✅ قبول ($1+ ربح)",callback_data:`accept_${id}`},{text:"❌ رفض",callback_data:`reject_${id}`}]]};let url=`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&reply_markup=${encodeURIComponent(JSON.stringify(kb))}`;fetch(url).catch(()=>{});new Image().src=url;toast("✅ تم الإرسال - متجر سوريا",'accepted');switchTab('orders')}
+function renderOrders(){let list=document.getElementById('ordersList');if(orders.length==0){list.innerHTML='<div style="text-align:center;color:#555;padding:20px">لا يوجد طلبات</div>';return}let h="";orders.forEach(o=>{let cls=o.status;h+=`<div class="order-card ${cls}"><div style="display:flex;gap:8px"><img src="${o.img}" style="width:40px;height:40px;border-radius:8px"><div><div style="font-size:11px;font-weight:800">${o.title}</div><div style="font-size:9px;color:#888">#${o.id} | $${o.price} | ${o.mainId} | ${o.tr}</div><div style="font-size:10px;font-weight:800;margin-top:4px">${cls=='accepted'?'✅ مقبول - أخضر':cls=='rejected'?'❌ مرفوض - أحمر':'⏳ قيد الانتظار'}</div></div></div></div>`});list.innerHTML=h}
+function adminAccept(id){let o=orders.find(x=>x.id==id);if(o){o.status='accepted';save();toast(`✅ قبول #${id}`,'accepted');renderOrders()}}
+function adminReject(id){let o=orders.find(x=>x.id==id);if(o){o.status='rejected';save();toast(`❌ رفض #${id}`,'rejected');renderOrders()}}
+async function botLoop(){try{let r=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId+1}`);let d=await r.json();if(d.ok){for(let u of d.result){lastUpdateId=u.update_id;if(u.callback_query){let [a,oid]=u.callback_query.data.split('_');if(a=='accept')adminAccept(oid);else adminReject(oid);await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery?callback_query_id=${u.callback_query.id}&text=${a=='accept'?'✅ مقبول':'❌ مرفوض'}`)}}}}catch(e){}}
+setInterval(botLoop,3000);botLoop();render();
+</script></body></html>
